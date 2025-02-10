@@ -1,0 +1,16 @@
+# Ignore secret files
+secrets.txt
+*.env
+
+# Ignore all results files
+/results/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# IDE files
+.vscode/
+.idea/
+
+.results/
