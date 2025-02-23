@@ -1,47 +1,11 @@
 from helper import get_api_key
 from helper import save_text_result
-import http.client
-import json
+from api_client import *
 from read_file import sanitize_code_from_file
 
 """
 This Program creates Discussions with multiple AI-Agents about how to best answer the users' prompt.
 """
-
-
-api_key = get_api_key("secrets.txt")
-
-conn = http.client.HTTPSConnection("api.venice.ai")
-
-def request(method, endpoint, payload, headers):
-    """Make an HTTP request to the Venice API
-    
-    Args:
-        method (str): HTTP method (GET/POST/PUT etc)
-        endpoint (str): API endpoint URL path
-        payload (bytes): Request body content
-        headers (dict): HTTP headers to include
-    
-    Returns:
-        bytes: Raw response content
-    """
-    conn.request(method, endpoint, payload, headers)
-    response = conn.getresponse()
-    return response.read()
-
-def jsonfy(data):
-    data = json.loads(data.decode("utf-8"))
-    return(json.dumps(data, indent=4))  # Pretty-print with indentation
-
-def extract_message(data):
-    try:
-        data = json.loads(data.decode("utf-8"))
-        message = data.get("choices", [{}])[0].get("message", {}).get("content", "No message content")
-        return message
-    except Exception as e:
-        print(e)
-        print(data)
-        return ""
 
 model_mapping = {
     "llama-3.1": "llama-3.1-405b",
@@ -52,30 +16,6 @@ model_mapping = {
     "deepseek":  "deepseek-r1-llama-70b",
     "deepseek-full": "deepseek-r1-671b"         # deepseek stops returning any content if the discussion gets to long
 }
-
-                    #role = (user/system)
-def chat_completion(message, role, model, debug = False):
-    payload = json.dumps({
-        "model": f"{model_mapping[model]}",
-        "messages": [
-            {
-                "role": role,
-                "content": message
-            }
-        ],
-        "venice_parameters": {
-            "include_venice_system_prompt": False
-        }
-    }).encode('utf-8')
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    print(f"[Requesting Repsonse from {model}]")
-    response = request("POST", "/api/v1/chat/completions", payload, headers)
-    if(debug):
-        print(jsonfy(response))
-    return response
     
 def get_file_name(user_prompt):
     print("Generating File Name")
@@ -84,7 +24,6 @@ def get_file_name(user_prompt):
     message = extract_message(response)
     print(message)
     return message
-
 
 
 def generate_prompt(name: str, models: list, discussion: str, rounds: int, user_prompt: str, final: bool = False) -> str:
