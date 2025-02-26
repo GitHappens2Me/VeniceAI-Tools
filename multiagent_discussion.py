@@ -7,16 +7,15 @@ from read_file import sanitize_code_from_file
 This Program creates Discussions with multiple AI-Agents about how to best answer the users' prompt.
 """
 
-model_mapping = {
+MODEL_MAPPING = {
     "llama-3.1": "llama-3.1-405b",
     "llama-3.2": "llama-3.2-3b",
     "llama-3.3": "llama-3.3-70b",
-    "qwen":      "qwen2.5-coder-32b", #old: "qwen32b",
+    "qwen":      "qwen2.5-coder-32b",
     "dolphin":   "dolphin-2.9.2-qwen2-72b",
     "deepseek":  "deepseek-r1-llama-70b",
-    "deepseek-full": "deepseek-r1-671b"         # deepseek stops returning any content if the discussion gets to long
+    "deepseek-full": "deepseek-r1-671b"
 }
-    
 def get_file_name(user_prompt):
     print("Generating File Name")
     prompt = f"Give me a descriptive Filename for a Textfile containing a discussion about the Question '{user_prompt}'. Just return the Filename. Dont include any Extension (such as .txt). Do not answer with any text other than the filename. The Filename should have underscores to split words."
@@ -62,10 +61,33 @@ def generate_prompt(name: str, models: list, discussion: str, rounds: int, user_
 
     return initial_instructions + (final_instructions if final else "")
 
+## Modelnames: You can use the Names (instead) of their IDs
+## Names are defined in api_client.py
+#  "llama-3.1": "llama-3.1-405b",
+#  "llama-3.2": "llama-3.2-3b",
+#  "llama-3.3": "llama-3.3-70b",
+#  "qwen":      "qwen2.5-coder-32b",            # old: "qwen32b",
+#  "dolphin":   "dolphin-2.9.2-qwen2-72b",
+#  "deepseek":  "deepseek-r1-llama-70b",
+#  "deepseek-full": "deepseek-r1-671b"          # deepseek stops returning any content if the discussion gets to long
+    
 
-def start_session(user_prompt, active_models = ["dolphin"], rounds = 3, debug = False):
+def start_session(
+    user_prompt: str,
+    active_models: list[str] = ["llama-3.3", "deepseek", "dolphin", "qwen"],
+    rounds: int = 5,
+    debug: bool = False
+) -> None:
+    """Orchestrate a multi-agent discussion session.
+    
+    Args:
+        user_prompt: Initial user question/request to discuss
+        active_models: List of AI models participating in the discussion
+        rounds: Number of discussion rounds
+        debug: Enable debug output
+    """
     #print(sanitize_code_from_file("multiagent.py")[:25]+ "...")
-    #user_prompt += sanitize_code_from_file("multiagent.py")
+    user_prompt += sanitize_code_from_file("multiagent_discussion.py")
     discussion = ""
     for round in range(1, rounds + 1):
         discussion += f"\t[Round {round}:]\n"
@@ -89,7 +111,9 @@ def start_session(user_prompt, active_models = ["dolphin"], rounds = 3, debug = 
     sanitized_title = "".join(c for c in user_prompt if c not in '?/:\\')
     sanitized_title = sanitized_title.rstrip('.')  # Remove trailing dots
 
-    discussion = "Prompt Format:\n" + generate_prompt("{name}", active_models, "[...]", 420 , user_prompt, final = True) + "\n\n" + discussion
+    discussion = "Prompt Format:\n" + generate_prompt(
+        "{name}", active_models, "[...]", 420, user_prompt, final=True
+    ) + "\n\n" + discussion
     
     save_text_result(f"{get_file_name(user_prompt)}.txt", "discussions", discussion)
 
@@ -97,7 +121,7 @@ def start_session(user_prompt, active_models = ["dolphin"], rounds = 3, debug = 
 
 
 ## The AI-Agents will discuss how to answer the following prompt:
-user_prompt = "Why is the Sky blue?"
+user_prompt = "Can you improve the following Code for me? : "
 
 # Starting the discussion 
 start_session(user_prompt, rounds = 1)
