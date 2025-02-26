@@ -3,6 +3,8 @@ from helper import save_text_result
 from api_client import *
 from read_file import sanitize_code_from_file
 
+#TODO Generate requirements.txt
+
 """
 This Program creates Discussions with multiple AI-Agents about how to best answer the users' prompt.
 """

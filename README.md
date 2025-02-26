@@ -16,10 +16,7 @@ A practical collection of Python tools designed to work with VeniceAI's API.
    - Rename `example.secrets.txt` to `secrets.txt`
    - Add your VeniceAI API key to this file
 
-2. **Install Dependencies**:
-```bash
-pip install -r requirements.txt
-```
+
 
 ## Contributing 🤝
 
