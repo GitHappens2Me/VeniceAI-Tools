@@ -76,8 +76,8 @@ def generate_prompt(name: str, models: list, discussion: str, rounds: int, user_
 
 def start_session(
     user_prompt: str,
-    active_models: list[str] = ["llama-3.3", "deepseek", "dolphin", "qwen"],
-    rounds: int = 5,
+    active_models: list[str] = ["llama-3.3", "dolphin", "qwen"],
+    rounds: int = 1,
     debug: bool = False
 ) -> None:
     """Orchestrate a multi-agent discussion session.
@@ -88,8 +88,6 @@ def start_session(
         rounds: Number of discussion rounds
         debug: Enable debug output
     """
-    #print(sanitize_code_from_file("multiagent.py")[:25]+ "...")
-    user_prompt += sanitize_code_from_file("multiagent_discussion.py")
     discussion = ""
     for round in range(1, rounds + 1):
         discussion += f"\t[Round {round}:]\n"
@@ -123,7 +121,7 @@ def start_session(
 
 
 ## The AI-Agents will discuss how to answer the following prompt:
-user_prompt = "Can you improve the following Code for me? : "
+user_prompt = "Can you give me an example workflow for chaumian ecash?"
 
 # Starting the discussion 
 start_session(user_prompt, rounds = 1)
