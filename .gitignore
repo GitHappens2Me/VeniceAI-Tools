@@ -4,7 +4,7 @@ secrets.txt
 
 # Ignore all results files
 /results/
-
+*.jpg
 # Python cache
 __pycache__/
 *.py[cod]

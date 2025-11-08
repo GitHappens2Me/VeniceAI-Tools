@@ -9,15 +9,6 @@ from read_file import sanitize_code_from_file
 This Program creates Discussions with multiple AI-Agents about how to best answer the users' prompt.
 """
 
-MODEL_MAPPING = {
-    "llama-3.1": "llama-3.1-405b",
-    "llama-3.2": "llama-3.2-3b",
-    "llama-3.3": "llama-3.3-70b",
-    "qwen":      "qwen2.5-coder-32b",
-    "dolphin":   "dolphin-2.9.2-qwen2-72b",
-    "deepseek":  "deepseek-r1-llama-70b",
-    "deepseek-full": "deepseek-r1-671b"
-}
 def get_file_name(user_prompt):
     print("Generating File Name")
     prompt = f"Give me a descriptive Filename for a Textfile containing a discussion about the Question '{user_prompt}'. Just return the Filename. Dont include any Extension (such as .txt). Do not answer with any text other than the filename. The Filename should have underscores to split words."
@@ -58,7 +49,7 @@ def generate_prompt(name: str, models: list, discussion: str, rounds: int, user_
     
     final_instructions = (
         f"[You are the final AI-Agent to speak in this discussion. Your task is to summarize the key points discussed and provide the final answer to the user. "
-        f"The user should not be aware that there was a discussion. Ensure that the final answer reflects all important elements discussed.]"
+        f"The user should not be aware that there was a discussion. Ensure that the final answer reflects all important elements discussed. In this round you response should exceed the 150 word limit so it can encompass all discussed topics. Please also format the answer apealingly.]"
     )
 
     return initial_instructions + (final_instructions if final else "")
@@ -76,7 +67,7 @@ def generate_prompt(name: str, models: list, discussion: str, rounds: int, user_
 
 def start_session(
     user_prompt: str,
-    active_models: list[str] = ["llama-3.3", "deepseek", "dolphin", "qwen"],
+    active_models: list[str] = ["Large", "Medium", "Small", "GLM"],
     rounds: int = 5,
     debug: bool = False
 ) -> None:
@@ -89,14 +80,14 @@ def start_session(
         debug: Enable debug output
     """
     #print(sanitize_code_from_file("multiagent.py")[:25]+ "...")
-    user_prompt += sanitize_code_from_file("multiagent_discussion.py")
+    #user_prompt += sanitize_code_from_file("multiagent_discussion.py")
     discussion = ""
     for round in range(1, rounds + 1):
         discussion += f"\t[Round {round}:]\n"
         for model in active_models:
             prompt = generate_prompt(model, active_models, discussion, rounds, user_prompt)
             #print(prompt.upper())
-            response = chat_completion(prompt, "user", model, debug)
+            response = chat_completion(prompt, "user", model, debug, strip_thinking=True)
             message = extract_message(response)
             discussion += f"\n[{model.upper()}:] '{message}'\n"
             #print("\n\n-----------------------\n", discussion, "\n-----------------------\n\n")
@@ -123,9 +114,9 @@ def start_session(
 
 
 ## The AI-Agents will discuss how to answer the following prompt:
-user_prompt = "Can you improve the following Code for me? : "
+#user_prompt = "Can you improve the following Code for me? : "
 
 # Starting the discussion 
-start_session(user_prompt, rounds = 1)
+start_session(input("What do you want the AIs to discuss?"), rounds = 5)
 
 

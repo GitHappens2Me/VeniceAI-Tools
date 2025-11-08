@@ -29,7 +29,8 @@ def seed_explorer(prompt, style, start_seed = 0, max_seeds = 50, x = 1280, y = 1
 #print(extract_message(chat_completion("Why is the sky blue?", "user", model = "llama-3.3")))
 
 ## Simple Image Generation
-#image_gen("Heaven", x = 960, y = 960, seed = random.randint(0, 99999), style=random.choice(styles))
+for i in range(1000):
+    image_gen("Prompt, Logo, icon", x = 960, y = 960, seed = random.randint(0, 99999), style=random.choice(styles), model="venice-sd35")
 
 ## Generates an Image at each Step of the Generation Process
 #step_animation("Heaven", 1280, 1280, seed = random.randint(0, 99999), style="Photographic", max_steps=30, model="stable-diffusion-3.5")
